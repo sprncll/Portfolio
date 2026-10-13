@@ -28,6 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
         menuToggle.addEventListener("click", function () {
 
             navMenu.classList.toggle("show");
+            menuToggle.setAttribute(
+                "aria-expanded",
+                navMenu.classList.contains("show")
+            );
 
             if (navMenu.classList.contains("show")) {
                 menuToggle.textContent = "✕";
@@ -37,6 +41,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
 
+
+        /* Close menu on outside click or Escape */
+
+        const closeMenu = function () {
+            navMenu.classList.remove("show");
+            menuToggle.textContent = "☰";
+            menuToggle.setAttribute("aria-expanded", "false");
+        };
+
+        document.addEventListener("click", function (event) {
+            if (!navMenu.contains(event.target) &&
+                !menuToggle.contains(event.target)) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                closeMenu();
+            }
+        });
 
         /* Close menu after clicking a link */
 
@@ -55,6 +80,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+
+
+    /* -----------------------------------------
+       HEADER SHADOW ON SCROLL
+       ----------------------------------------- */
+
+    const header = document.querySelector(".header");
+
+    if (header) {
+        const onScroll = function () {
+            header.classList.toggle("scrolled", window.scrollY > 10);
+        };
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+    }
+
+
+    /* -----------------------------------------
+       SCROLL REVEAL ANIMATIONS
+       ----------------------------------------- */
+
+    const revealTargets = document.querySelectorAll(
+        ".section-heading, .info-card, .skill-card, .soft-skill, " +
+        ".project-card, .timeline-item, .education-item, .stat-card, " +
+        ".contact-card, .quote-card, .cta-content, .about-grid > *, " +
+        ".intro-grid > div"
+    );
+
+    if ("IntersectionObserver" in window) {
+
+        document.documentElement.classList.add("js");
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("in-view");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+
+        revealTargets.forEach(function (el, i) {
+            el.classList.add("reveal");
+            el.style.setProperty("--delay", (i % 3) * 0.08 + "s");
+            observer.observe(el);
+        });
+
+    }
 
     /* -----------------------------------------
        CONTACT FORM
